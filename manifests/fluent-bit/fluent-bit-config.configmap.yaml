@@ -1,0 +1,58 @@
+# source: https://github.com/fluent/fluent-bit-kubernetes-logging/blob/master/output/elasticsearch/fluent-bit-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: logging
+  labels:
+    k8s-app: fluent-bit
+data:
+  # Configuration files: server, input, filters and output
+  # ======================================================
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         1
+        Log_Level     debug
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+    @INCLUDE input-nginx.conf
+    @INCLUDE filter-nginx.conf
+    @INCLUDE output-log-parser.conf
+  input-nginx.conf: |
+    [INPUT]
+        Name              tail
+        Tag               nginx
+        Path              /var/log/containers/ingress-nginx-controller-*.log
+        DB                /var/log/flb_kube.db
+        Parser            docker
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+  filter-nginx.conf: |
+    [FILTER]
+        Name                nginx
+        Match               nginx.*
+        Merge_Log_Key       log_processed
+        Merge_Log_Trim On
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+
+  output-log-parser.conf: |
+    [OUTPUT]
+        Name  websocket
+        Match *
+        Host  golang-log-parser-app-service.golang-log-parser.svc.cluster.local
+        Port  8080
+        URI   /socket
+        Format json
+  parsers.conf: |
+    [PARSER]
+        Name         docker
+        Format       json
+        Time_Key     abswedkqwit
+        Time_Format  %Y
+        Time_Keep    Off

@@ -1,0 +1,26 @@
+apiVersion: k3d.io/v1alpha3
+kind: Simple
+name: prometheus-sandbox
+servers: 1
+agents: 1
+image: rancher/k3s:v1.20.4-k3s1
+registries: # define how registries should be created or used
+  use:
+    - k3d-registry-dev.localhost:5555
+ports:
+  - port: 8080:80 # same as `--port '8080:80@loadbalancer'`
+    nodeFilters:
+      - loadbalancer
+options:
+  k3s: # options passed on to K3s itself
+    extraArgs: # additional arguments passed to the `k3s server` command
+      - arg: --no-deploy=traefik
+        nodeFilters:
+          - server:*
+    nodeLabels:
+      - label: kubernetes.io/os=linux # same as `--k3s-node-label 'foo=bar@agent:1'` -> this results in a Kubernetes node label
+        nodeFilters:
+          - agent:*
+      - label: ingress-ready=true
+        nodeFilters:
+          - agent:*

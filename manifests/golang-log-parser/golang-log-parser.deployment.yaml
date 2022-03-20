@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golang-log-parser-app
+  namespace: golang-log-parser
+  labels:
+    app: golang-log-parser-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: golang-log-parser-app
+  template:
+    metadata:
+      labels:
+        app: golang-log-parser-app
+    spec:
+      containers:
+      - name: golang-log-parser-app
+        image: k3d-registry-dev.localhost:5555/golang-log-parser
+        ports:
+        - containerPort: 8080

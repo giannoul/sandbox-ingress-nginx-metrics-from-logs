@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: golang-log-parser-app-service
+  namespace: golang-log-parser
+spec:
+  selector:
+    app: golang-log-parser-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
