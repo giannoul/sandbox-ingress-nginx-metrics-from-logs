@@ -31,3 +31,6 @@ ingress-nginx-controller configuration:
 fluentbit:
 * https://coralogix.com/blog/fluent-bit-guide/
 * https://fluentbit.io/blog/2020/12/02/supercharge-your-logging-pipeline-with-fluent-bit-stream-processing/ 
+
+### Application
+We can access the sample application in: http://localhost:8080/
